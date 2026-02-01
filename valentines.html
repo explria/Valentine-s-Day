@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A Very Important Question 💕</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka+One&family=Quicksand:wght@400;600;700&display=swap');
+
+  :root {
+    --pink: #ff6b9d;
+    --hot-pink: #ff2d78;
+    --soft-pink: #ffb3d1;
+    --cream: #fff5f8;
+    --text: #3a1a2e;
+    --yes-green: #2ecc71;
+    --no-red: #e74c3c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: var(--cream);
+    font-family: 'Quicksand', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    transition: background 0.4s;
+  }
+
+  /* Floating hearts background */
+  .hearts-container {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .heart {
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0;
+    animation: floatHeart linear infinite;
+  }
+  @keyframes floatHeart {
+    0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.6; }
+    100% { transform: translateY(-120px) rotate(360deg); opacity: 0; }
+  }
+
+  /* Card */
+  .card {
+    position: relative;
+    z-index: 1;
+    background: white;
+    border-radius: 28px;
+    padding: 48px 40px 40px;
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 12px 50px rgba(255, 45, 120, 0.18);
+    border: 3px solid var(--soft-pink);
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes popIn {
+    0%   { transform: scale(0.6); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .emoji-top {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 8px;
+    animation: bounce 1s ease infinite alternate;
+  }
+  @keyframes bounce {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(-10px); }
+  }
+
+  .question-text {
+    font-family: 'Bangers', cursive;
+    font-size: 1.8rem;
+    color: var(--text);
+    letter-spacing: 1px;
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+
+  .sub-text {
+    font-size: 0.95rem;
+    color: var(--pink);
+    font-weight: 600;
+    margin-bottom: 28px;
+    min-height: 1.2em;
+    transition: all 0.3s;
+  }
+
+  /* Buttons row */
+  .buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.25rem;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 36px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .btn:active { transform: scale(0.93) !important; }
+
+  .btn-yes {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    box-shadow: 0 4px 18px rgba(46,204,113,0.4);
+    font-size: 1.6rem;
+    padding: 18px 52px;
+    animation: yesGlow 2s ease infinite alternate;
+  }
+  .btn-yes:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(46,204,113,0.55); }
+  @keyframes yesGlow {
+    0%   { box-shadow: 0 4px 18px rgba(46,204,113,0.4); }
+    100% { box-shadow: 0 4px 32px rgba(46,204,113,0.7); }
+  }
+
+  .btn-no {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    box-shadow: 0 4px 14px rgba(231,76,60,0.35);
+    transition: transform 0.15s, box-shadow 0.15s, font-size 0.2s;
+  }
+  .btn-no:hover { transform: scale(1.05); }
+
+  /* Yes screen */
+  .yes-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .yes-screen.show { display: flex; }
+  .yes-emoji { font-size: 5rem; margin-bottom: 12px; }
+  .yes-title {
+    font-family: 'Bangers', cursive;
+    font-size: 2.8rem;
+    color: var(--hot-pink);
+    letter-spacing: 2px;
+  }
+  .yes-sub {
+    font-size: 1.1rem;
+    color: var(--pink);
+    font-weight: 600;
+    margin-top: 8px;
+  }
+
+  /* Confetti canvas */
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 999; }
+
+  /* --- No button chaos stages --- */
+  /* Stage: shake */
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-7px); }
+    80% { transform: translateX(7px); }
+  }
+  .btn-no.shake { animation: shake 0.4s ease; }
+
+  /* Stage: spin */
+  @keyframes spin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(720deg); }
+  }
+  .btn-no.spin { animation: spin 0.5s ease; }
+
+  /* Stage: flip */
+  @keyframes flip {
+    0%   { transform: rotateX(0deg); }
+    100% { transform: rotateX(720deg); }
+  }
+  .btn-no.flip { animation: flip 0.5s ease; }
+
+  /* Stage: rubber */
+  @keyframes rubber {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(0.5, 1.5); }
+    50%  { transform: scale(1.5, 0.5); }
+    70%  { transform: scale(0.8, 1.2); }
+    100% { transform: scale(1); }
+  }
+  .btn-no.rubber { animation: rubber 0.5s ease; }
+
+  /* Stage: jiggle */
+  @keyframes jiggle {
+    0%,100% { transform: rotate(0); }
+    25%     { transform: rotate(-8deg) scale(1.1); }
+    50%     { transform: rotate(8deg) scale(0.9); }
+    75%     { transform: rotate(-4deg) scale(1.05); }
+  }
+  .btn-no.jiggle { animation: jiggle 0.45s ease; }
+
+  /* Stage: bounce-away */
+  @keyframes bounceAway {
+    0%   { transform: translateY(0); }
+    40%  { transform: translateY(-80px); }
+    60%  { transform: translateY(-40px); }
+    80%  { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+  }
+  .btn-no.bounce-away { animation: bounceAway 0.6s ease; }
+
+  /* dark mode flash */
+  body.dark-flash { background: #1a0a1e !important; }
+  body.dark-flash .card { background: #2d1b3d; border-color: #9b59b6; }
+  body.dark-flash .question-text { color: #e8d5f0; }
+  body.dark-flash .sub-text { color: #c39bd3; }
+
+  /* upside down */
+  body.upside-down .card { transform: rotate(180deg); transition: transform 0.5s cubic-bezier(0.68,-0.55,0.265,1.55); }
+
+  /* mirror */
+  body.mirror .card { transform: scaleX(-1); transition: transform 0.4s; }
+
+  /* tiny */
+  body.tiny .card { transform: scale(0.35); transition: transform 0.3s ease; }
+
+  /* giant */
+  body.giant .card { transform: scale(1.8); transition: transform 0.4s ease; }
+
+  /* rainbow */
+  body.rainbow .card {
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4, #ffecd2, #a1c4fd, #c2e9fb, #a18cd1, #fbc2eb) !important;
+    transition: background 0.3s;
+  }
+
+  /* Nyan trail */
+  .nyan {
+    position: fixed;
+    font-size: 2.5rem;
+    z-index: 500;
+    pointer-events: none;
+    top: -60px;
+    animation: nyanRun 1.8s linear forwards;
+  }
+  @keyframes nyanRun {
+    0%   { left: -60px; top: 30%; }
+    50%  { top: 20%; }
+    100% { left: calc(100% + 60px); top: 30%; }
+  }
+  .nyan-trail {
+    position: fixed;
+    height: 14px;
+    z-index: 499;
+    pointer-events: none;
+    top: calc(30% + 20px);
+    left: 0;
+    width: 0;
+    background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
+    animation: trailGrow 1.8s linear forwards;
+    border-radius: 0 7px 7px 0;
+  }
+  @keyframes trailGrow {
+    0%   { width: 0; }
+    100% { width: 100%; }
+  }
+
+  /* Screams banner */
+  .scream-banner {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: #e74c3c;
+    color: white;
+    font-family: 'Bangers', cursive;
+    font-size: 2rem;
+    text-align: center;
+    padding: 12px;
+    z-index: 600;
+    letter-spacing: 3px;
+    animation: slideBannerIn 0.3s ease forwards, slideBannerOut 0.4s ease 2s forwards;
+  }
+  @keyframes slideBannerIn { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+  @keyframes slideBannerOut { from { transform: translateY(0); } to { transform: translateY(-100%); } }
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="hearts-container" id="heartsContainer"></div>
+
+<!-- Main question card -->
+<div class="card" id="mainCard">
+  <span class="emoji-top">💝</span>
+  <div class="question-text" id="questionText">Will you go on a Valentine's Date with me?</div>
+  <div class="sub-text" id="subText">It'll be really fun, I promise!</div>
+  <div class="buttons" id="buttonsWrap">
+    <button class="btn btn-no" id="noBtn" onclick="handleNo()">No</button>
+    <button class="btn btn-yes" onclick="handleYes()">Yes!</button>
+  </div>
+</div>
+
+<!-- Yes celebration -->
+<div class="yes-screen" id="yesScreen">
+  <div class="yes-emoji">🎉💕🎊</div>
+  <div class="yes-title">Yaaaay!! 🥳</div>
+  <div class="yes-sub">Get ready for the best Valentine's ever! ❤️</div>
+</div>
+
+<script>
+// --- Floating Hearts ---
+(function spawnHearts() {
+  const c = document.getElementById('heartsContainer');
+  const emojis = ['💕','❤️','🌷','💗','💖','🌹','💘','🫶'];
+  for (let i = 0; i < 18; i++) {
+    const h = document.createElement('div');
+    h.className = 'heart';
+    h.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    h.style.left = Math.random() * 100 + 'vw';
+    h.style.animationDuration = (6 + Math.random() * 8) + 's';
+    h.style.animationDelay = (Math.random() * 8) + 's';
+    h.style.fontSize = (0.8 + Math.random() * 1.8) + 'rem';
+    c.appendChild(h);
+  }
+})();
+
+// --- No button state ---
+let noCount = 0;
+
+const noMessages = [
+  "Are you sure? 🥺",
+  "Pleaaaaase? 🥺👀",
+  "Come on, it'll be fun!",
+  "Don't be like that… 😢",
+  "I'll be really sad… 😭",
+  "Last chance… I have plans! 👀",
+  "…seriously though? 💔",
+  "You're breaking my heart!",
+  "OK fine… I'll just cry then 😢💔",
+  "…are you really sure? 🤔"
+];
+
+const questionTexts = [
+  "Will you go on a Valentine's Date with me?",
+  "…are you sure you don't want to? 🥺",
+  "What if I said please? 🙏",
+  "What if I said pretty please? ✨",
+  "But WHAT IF the date is amazing??",
+  "I'll literally plan everything! 🌹",
+  "…okay but what if there's chocolate?",
+  "COME ON!! 😤💕",
+  "You know you want to… 😏",
+  "Last try, I promise! 💝"
+];
+
+// Chaos stages applied to No button
+const chaosFn = [
+  () => { triggerAnim('shake'); },                         // 1
+  () => { triggerAnim('spin'); shrinkNo(); },              // 2
+  () => { triggerAnim('flip'); moveNoRandom(); },          // 3
+  () => { triggerAnim('rubber'); growYes(); },             // 4
+  () => { triggerAnim('jiggle'); moveNoRandom(); shrinkNo(); darkFlash(); }, // 5
+  () => { triggerAnim('bounce-away'); nyanCat(); },        // 6
+  () => { triggerAnim('shake'); flipWorld(); },            // 7
+  () => { triggerAnim('spin'); mirrorWorld(); setTimeout(()=>mirrorWorld(),800); }, // 8
+  () => { triggerAnim('rubber'); tinyWorld(); setTimeout(()=>tinyWorld(),600); },   // 9
+  () => { screamBanner("WHY THOUGH?! 😭"); rainbowCard(); setTimeout(()=>rainbowCard(),1800); } // 10
+];
+
+function handleNo() {
+  noCount++;
+  const idx = noCount - 1;
+
+  // Update text
+  document.getElementById('subText').textContent = noMessages[Math.min(idx, noMessages.length - 1)];
+  document.getElementById('questionText').textContent = questionTexts[Math.min(idx, questionTexts.length - 1)];
+
+  // Run chaos function
+  if (chaosFn[idx]) chaosFn[idx]();
+  else {
+    // After all stages: just go straight to Yes
+    setTimeout(handleYes, 300);
+  }
+}
+
+function triggerAnim(name) {
+  const btn = document.getElementById('noBtn');
+  btn.classList.remove('shake','spin','flip','rubber','jiggle','bounce-away');
+  void btn.offsetWidth; // reflow
+  btn.classList.add(name);
+  btn.addEventListener('animationend', () => btn.classList.remove(name), { once: true });
+}
+
+function shrinkNo() {
+  const btn = document.getElementById('noBtn');
+  const cur = parseFloat(btn.style.fontSize || '1.25');
+  btn.style.fontSize = Math.max(cur - 0.18, 0.55) + 'rem';
+  btn.style.padding = Math.max(14 - noCount * 1.5, 4) + 'px ' + Math.max(36 - noCount * 3, 8) + 'px';
+}
+
+function moveNoRandom() {
+  const btn = document.getElementById('noBtn');
+  btn.style.position = 'relative';
+  btn.style.left = (Math.random() * 140 - 70) + 'px';
+  btn.style.top = (Math.random() * 60 - 30) + 'px';
+}
+
+function growYes() {
+  const btn = document.querySelector('.btn-yes');
+  const cur = parseFloat(btn.style.fontSize || '1.6');
+  btn.style.fontSize = (cur + 0.2) + 'rem';
+  btn.style.padding = (18 + noCount * 3) + 'px ' + (52 + noCount * 4) + 'px';
+}
+
+function darkFlash() {
+  document.body.classList.add('dark-flash');
+  setTimeout(() => document.body.classList.remove('dark-flash'), 700);
+}
+
+function flipWorld() {
+  document.body.classList.toggle('upside-down');
+  setTimeout(() => document.body.classList.remove('upside-down'), 1200);
+}
+
+function mirrorWorld() {
+  document.body.classList.toggle('mirror');
+}
+
+function tinyWorld() {
+  document.body.classList.toggle('tiny');
+}
+
+function rainbowCard() {
+  document.body.classList.toggle('rainbow');
+}
+
+function nyanCat() {
+  const n = document.createElement('div');
+  n.className = 'nyan'; n.textContent = '🐱🌈';
+  document.body.appendChild(n);
+  const t = document.createElement('div');
+  t.className = 'nyan-trail';
+  document.body.appendChild(t);
+  setTimeout(() => { n.remove(); t.remove(); }, 2000);
+}
+
+function screamBanner(txt) {
+  const b = document.createElement('div');
+  b.className = 'scream-banner';
+  b.textContent = txt;
+  document.body.appendChild(b);
+  setTimeout(() => b.remove(), 2500);
+}
+
+// --- Yes Handler ---
+function handleYes() {
+  document.getElementById('mainCard').style.display = 'none';
+  const ys = document.getElementById('yesScreen');
+  ys.classList.add('show');
+  // reset body chaos classes
+  document.body.className = '';
+  launchConfetti();
+}
+
+// --- Confetti ---
+function launchConfetti() {
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors = ['#ff6b9d','#ff2d78','#2ecc71','#f39c12','#9b59b6','#3498db','#e74c3c','#1abc9c'];
+  let pieces = [];
+  for (let i = 0; i < 200; i++) {
+    pieces.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      w: 6 + Math.random() * 6,
+      h: 10 + Math.random() * 8,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rot: Math.random() * Math.PI * 2,
+      vx: (Math.random() - 0.5) * 3,
+      vy: 2 + Math.random() * 4,
+      vr: (Math.random() - 0.5) * 0.2
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      if (p.y > canvas.height) { p.y = -20; p.x = Math.random() * canvas.width; }
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+</script>
+</body>
+</html>
